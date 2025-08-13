@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.12-slim-bookworm
 ENV PYTHONPATH=/app
 WORKDIR /app/src
 
@@ -10,10 +10,6 @@ ADD --checksum=sha256:bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f
 # Install required packages
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-
-# Installing OpenVINO at the same time as main requirements doesn't work
-COPY requirements-openvino.txt .
-RUN pip install -r requirements-openvino.txt
 
 COPY src/ /app/src/
 
