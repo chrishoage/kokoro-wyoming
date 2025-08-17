@@ -13,6 +13,8 @@ from kokoro_onnx import Kokoro
 from kokoro_onnx.log import log
 import numpy as np
 
+from .sentence_boundary import SentenceBoundaryDetector, remove_asterisks
+
 from wyoming.info import (
     Attribution,
     TtsProgram,
@@ -114,6 +116,7 @@ class KokoroEventHandler(AsyncEventHandler):
         self.kokoro = kokoro_instance
         self.args = args
         self.wyoming_info_event = wyoming_info.event()
+        self.sbd = SentenceBoundaryDetector()
         self.is_streaming = False
         self._synthesize = None
 
@@ -153,11 +156,18 @@ class KokoroEventHandler(AsyncEventHandler):
             assert self.is_streaming
             _LOGGER.debug("Synthesizing stream chunk.")
             stream_chunk = SynthesizeChunk.from_event(event)
-            self._synthesize.text = stream_chunk.text
-            await self._handle_synthesize(self._synthesize)
+            for sentence in self.sbd.add_chunk(stream_chunk.text):
+                _LOGGER.debug("Synthesizing stream sentence: %s", sentence)
+                self._synthesize.text = sentence
+                await self._handle_synthesize(self._synthesize)
             return True
         elif SynthesizeStop.is_type(event.type):
+            assert self._synthesize is not None
             _LOGGER.debug("Stopping streaming synthesis.")
+            self._synthesize.text = self.sbd.finish()
+            if self._synthesize.text:
+                # Send any final chunks.
+                await self._handle_synthesize(self._synthesize)
             await self.write_event(SynthesizeStopped().event())
             self._synthesize = None
             self.is_streaming = False

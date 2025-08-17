@@ -1,3 +1,4 @@
 wyoming>=1.7.0,<1.8
 numpy>=2.0.2
 kokoro-onnx[gpu]==0.4.5
+regex==2025.7.34
