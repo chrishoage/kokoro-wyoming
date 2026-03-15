@@ -1,6 +1,0 @@
-services:
-  app:
-    image: ghcr.io/relvacode/kokoro-wyoming:latest
-    ports:
-      - "10210:10210"
-    restart: unless-stopped

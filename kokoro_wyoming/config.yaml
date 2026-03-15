@@ -1,0 +1,37 @@
+name: Wyoming Kokoro TTS
+version: "1.0.0"
+slug: kokoro_wyoming
+description: >-
+  Local, high-quality text-to-speech using the Kokoro TTS model via Wyoming protocol.
+  Supports multiple languages and voices.
+url: https://github.com/chrishoage/kokoro-wyoming
+arch:
+  - amd64
+  - aarch64
+
+init: false
+startup: application
+boot: auto
+
+discovery:
+  - wyoming
+
+ports:
+  "10200/tcp": null
+ports_description:
+  10200/tcp: Wyoming protocol
+
+host_network: false
+hassio_api: false
+homeassistant_api: false
+
+options:
+  voice: af_heart
+  debug: false
+
+schema:
+  voice: str
+  debug: bool
+
+panel_icon: mdi:text-to-speech
+panel_title: Kokoro TTS

@@ -110,11 +110,11 @@ def get_model_voices(model: Kokoro) -> list[TtsVoice]:
 
 
 class KokoroEventHandler(AsyncEventHandler):
-    def __init__(self, wyoming_info: Info, kokoro_instance, *args, **kwargs):
+    def __init__(self, wyoming_info: Info, kokoro_instance, default_voice: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.kokoro = kokoro_instance
-        self.args = args
+        self.default_voice = default_voice
         self.wyoming_info_event = wyoming_info.event()
         self.sbd = SentenceBoundaryDetector()
         self.is_streaming = False
@@ -182,7 +182,7 @@ class KokoroEventHandler(AsyncEventHandler):
     async def _handle_synthesize(self, synthesize: Synthesize) -> Optional[bool]:
         try:
             # Get voice settings
-            voice_name = "af_heart"  # default voice
+            voice_name = self.default_voice
             if synthesize.voice:
                 voice_name = synthesize.voice.name
 
@@ -245,9 +245,7 @@ async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", default="0.0.0.0", help="Host to listen on")
     parser.add_argument("--port", type=int, default=10200, help="Port to listen on")
-    parser.add_argument(
-        "--uri", default="tcp://0.0.0.0:10210", help="unix:// or tcp://"
-    )
+    parser.add_argument("--voice", default="af_heart", help="Default voice")
     parser.add_argument(
         "--debug",
         action="store_true",
@@ -278,8 +276,8 @@ async def main():
         ]
     )
 
-    _LOGGER.info("Kokoro Onyx server starting on %s", args.uri)
-    server = AsyncServer.from_uri(args.uri)
+    _LOGGER.info("Kokoro Wyoming server starting on tcp://%s:%d", args.host, args.port)
+    server = AsyncServer.from_uri(f"tcp://{args.host}:{args.port}")
 
     # Handle OS signals
     loop = asyncio.get_event_loop()
@@ -287,7 +285,7 @@ async def main():
         loop.add_signal_handler(s, lambda: asyncio.create_task(server.stop()))
 
     # Start server with kokoro instance
-    await server.run(partial(KokoroEventHandler, wyoming_info, kokoro_instance))
+    await server.run(partial(KokoroEventHandler, wyoming_info, kokoro_instance, args.voice))
 
 
 if __name__ == "__main__":

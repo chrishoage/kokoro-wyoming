@@ -1,9 +1,0 @@
-services:
-  app:
-    extends:
-      service: app
-      file: docker-compose.yml
-    environment:
-      ONNX_PROVIDER: OpenVINOExecutionProvider
-    devices:
-      - /dev/dri:/dev/dri
