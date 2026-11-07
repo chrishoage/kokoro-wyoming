@@ -26,6 +26,6 @@ schema:
   speed: float(0.5,2.0)
   cache_size: int(0,)
   debug: bool
-# Uncomment once the "Build app" workflow has published an image, so Home
-# Assistant pulls it instead of building (and downloading the model) on-device.
-# image: ghcr.io/chrishoage/kokoro-wyoming
+# Published by the "Build app" workflow, so Home Assistant pulls the image
+# instead of building it (and downloading the model) on-device.
+image: ghcr.io/chrishoage/kokoro-wyoming
