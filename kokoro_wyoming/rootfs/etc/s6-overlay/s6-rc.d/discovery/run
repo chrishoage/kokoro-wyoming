@@ -1,0 +1,38 @@
+#!/command/with-contenv bashio
+# vim: ft=bash
+# shellcheck shell=bash
+# ==============================================================================
+# Send Wyoming discovery information to Home Assistant
+# ==============================================================================
+declare config
+
+# The server loads the model and runs a warmup synthesis before it listens,
+# so wait until it answers a describe request. This reads the whole reply:
+# hanging up with it unread makes the server log a ConnectionResetError.
+until python3 - 2> /dev/null <<'EOF'
+import asyncio, sys
+from wyoming.client import AsyncTcpClient
+from wyoming.info import Describe, Info
+
+async def describe():
+    async with AsyncTcpClient("127.0.0.1", 10200) as client:
+        await client.write_event(Describe().event())
+        event = await asyncio.wait_for(client.read_event(), timeout=5)
+        return event is not None and Info.is_type(event.type)
+
+sys.exit(0 if asyncio.run(describe()) else 1)
+EOF
+do
+    sleep 1
+done
+
+config=$(\
+    bashio::var.json \
+        uri "tcp://$(hostname | tr '_' '-'):10200" \
+)
+
+if bashio::discovery "wyoming" "${config}" > /dev/null; then
+    bashio::log.info "Successfully sent discovery information to Home Assistant."
+else
+    bashio::log.error "Discovery message to Home Assistant failed!"
+fi

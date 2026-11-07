@@ -1,0 +1,6 @@
+# Mirrors the root requirements.txt, minus the [gpu] extra: onnxruntime-gpu
+# pulls in CUDA and has no aarch64 wheels.
+wyoming>=1.7.0,<2
+numpy>=2.0.2
+kokoro-onnx==0.4.5
+sentence-stream>=1.0.0,<2

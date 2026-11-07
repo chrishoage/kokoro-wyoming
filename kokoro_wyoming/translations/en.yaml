@@ -1,0 +1,22 @@
+configuration:
+  voice:
+    name: Default voice
+    description: >-
+      Voice used when Home Assistant doesn't request a specific one. Voices are
+      named `<language><gender>_<name>`, for example `af_heart` is a US English
+      female voice and `bm_george` a British English male voice.
+  speed:
+    name: Speed
+    description: >-
+      Speaking rate multiplier. 1.0 is normal speed, lower is slower and higher
+      is faster.
+  cache_size:
+    name: Cache size
+    description: >-
+      Number of synthesized sentences kept in memory so repeated phrases play
+      instantly. Set to 0 to disable the cache.
+  debug:
+    name: Debug logging
+    description: Print DEBUG level messages to the app's log.
+network:
+  10200/tcp: Wyoming protocol

@@ -1,0 +1,21 @@
+#!/command/with-contenv bashio
+# vim: ft=bash
+# shellcheck shell=bash
+# ==============================================================================
+# Start the Kokoro Wyoming server
+# ==============================================================================
+
+flags=()
+
+if bashio::config.true 'debug'; then
+    flags+=('--debug')
+fi
+
+exec python3 /usr/src/kokoro_wyoming/main.py \
+    --uri 'tcp://0.0.0.0:10200' \
+    --model /usr/share/kokoro/kokoro-v1.0.onnx \
+    --voices /usr/share/kokoro/voices-v1.0.bin \
+    --voice "$(bashio::config 'voice')" \
+    --speed "$(bashio::config 'speed')" \
+    --max-cache "$(bashio::config 'cache_size')" \
+    "${flags[@]}"
